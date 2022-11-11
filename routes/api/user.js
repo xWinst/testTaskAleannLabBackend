@@ -12,7 +12,7 @@ router.patch("/:id", validateBody(schemas.update), ctrlWrapper(update));
 
 async function getAll(_, res) {
     const users = await User.find({}, "-createdAt -updatedAt");
-    res.json(users);
+    res.json(users.sort((a, b) => a.rank - b.rank));
 }
 
 async function add(req, res) {
