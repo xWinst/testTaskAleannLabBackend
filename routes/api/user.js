@@ -36,9 +36,11 @@ async function remove(req, res) {
 async function update(req, res) {
     const { id } = req.params;
     let { rank } = req.body;
+    const user = await User.findById(id);
+    if (!user) throw RequestError(404, "Not found");
+    const oldRank = user.rank;
 
-    if (rank) {
-        const oldRank = (await User.findById(id)).rank;
+    if (rank && rank !== oldRank) {
         const count = await User.find().count();
         if (rank > count) rank = count;
         if (rank < 1) rank = 1;
@@ -58,11 +60,8 @@ async function update(req, res) {
     const result = await User.findByIdAndUpdate(
         id,
         { ...req.body, rank },
-        {
-            new: true,
-        }
+        { new: true }
     );
-    if (!result) throw RequestError(404, "Not found");
 
     res.json(result);
 }
